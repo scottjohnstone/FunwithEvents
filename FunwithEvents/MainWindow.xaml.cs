@@ -22,10 +22,12 @@ namespace FunwithEvents
     /// 
     // ref: https://docs.microsoft.com/en-us/dotnet/api/system.delegate?f1url=%3FappId%3DDev16IDEF1%26l%3DEN-US%26k%3Dk(System.Delegate);k(DevLang-csharp)%26rd%3Dtrue&view=net-6.0
     // ref: https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/delegates/how-to-combine-delegates-multicast-delegates
+    // ref: https://stackoverflow.com/questions/10173978/read-return-value-from-delegate
+
     public partial class MainWindow : Window
     {
 
-        public delegate Task<List<string>> GenericMethod();
+        public delegate Task<List<string>> GenericMethod(List<string> s);
         // change <int> to process & percentage complete to show which process is what % complete
         // to list all the processes that are taking place and their completion level
 
@@ -36,6 +38,8 @@ namespace FunwithEvents
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            ListBoxStatus.Items.Clear();
+            ListBoxStatus.Items.Add("Listbox ready");
             Status.Text = "You clicked me - Hooray! Retrieving file...";
             heavyLifting();
         }
@@ -45,36 +49,43 @@ namespace FunwithEvents
             List<string> process = new List<string>();
 
             Files fileHandler = new Files(); // instantiate class
-            List<string> fileProcessor = new GenericMethod();
-            List<string> GenericMethod fileProcessor;
-            fileProcessor = fileHandler.query1();
-            fileProcessor += fileHandler.query2();
+            GenericMethod fileprocesor1;
+            GenericMethod fileprocesor2;
+            GenericMethod fileprocesor3;
 
-            
+            fileprocesor1 = fileHandler.query1;
+            fileprocesor2 = fileHandler.query2;
+            fileprocesor3 = fileprocesor1 + fileprocesor2;
+            //process = await fileprocesor3(process);
+
+            ListBoxStatus.Items.Clear();
 
             for (int i = 1; i < 5; i++)
             {
                 percentageComplete = ((double)i / (double)4) *100d;
-                process = await fileProcessor();
-                Status.Text = process +  " % complete:" + percentageComplete.ToString(); // update the result in UI
+                process = await fileprocesor3(process);
+                foreach (var item in process)
+                {
+                    Status.Text = item + " % complete:" + percentageComplete.ToString();
+                    ListBoxStatus.Items.Add(Status.Text);
+                }
+                
             }
         }
         public class Files
         {
-            List<string> allResults = new List<string>();
-
-            async public Task<List<string>> query1()
+            async public Task<List<string>> query1(List<string> s)
             {
                 await Task.Delay(TimeSpan.FromSeconds(1));
-                allResults.Add("query1");
-                return allResults;
+                s.Add("query1");
+                return s;
             }
 
-            async public Task<List<string>> query2()
+            async public Task<List<string>> query2(List<string> s)
             {
                 await Task.Delay(TimeSpan.FromSeconds(1));
-                allResults.Add("query2");
-                return allResults;
+                s.Add("query2");
+                return s;
             }
         }
     }

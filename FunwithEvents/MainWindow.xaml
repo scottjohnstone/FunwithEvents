@@ -10,6 +10,7 @@
     <Grid>
         <Button Content="Get from file" HorizontalAlignment="Left" Margin="447,120,0,0" VerticalAlignment="Top" Click="Button_Click"  />
         <TextBlock x:Name="Status" HorizontalAlignment="Left" Margin="365,260,0,0" Text="Status" TextWrapping="Wrap" VerticalAlignment="Top"/>
+        <ListBox x:Name="ListBoxStatus" Margin="82,54,419,247"/>
 
     </Grid>
 </Window>
