@@ -24,6 +24,7 @@ namespace FunwithEvents
     // ref: https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/delegates/how-to-combine-delegates-multicast-delegates
     // ref: https://stackoverflow.com/questions/10173978/read-return-value-from-delegate
 
+
     public partial class MainWindow : Window
     {
 
@@ -56,20 +57,31 @@ namespace FunwithEvents
             fileprocesor1 = fileHandler.query1;
             fileprocesor2 = fileHandler.query2;
             fileprocesor3 = fileprocesor1 + fileprocesor2;
-            //process = await fileprocesor3(process);
 
             ListBoxStatus.Items.Clear();
 
+            // goal: to monitor the status of a long running task, update the user to it's progress, and then move on when done
+
+            int counter = 0;
             for (int i = 1; i < 5; i++)
             {
                 percentageComplete = ((double)i / (double)4) *100d;
-                process = await fileprocesor3(process);
-                foreach (var item in process)
+                Status.Text = "starting processes";
+                
+                Task<List<string>> processz = fileprocesor3(process);
+                while (processz.Result.Count<2)
                 {
-                    Status.Text = item + " % complete:" + percentageComplete.ToString();
+                    Status.Text = "still waiting! " + counter.ToString();
+                    counter++;
+                }
+                //Task processz = fileprocesor3(process);
+                //process = await fileprocesor3(process);
+                foreach (var item in fileprocesor3.GetInvocationList())
+                {
+                    Status.Text = item.Method.Name + " % complete:" + percentageComplete.ToString();
                     ListBoxStatus.Items.Add(Status.Text);
                 }
-                
+                Status.Text = "done";
             }
         }
         public class Files
@@ -83,7 +95,7 @@ namespace FunwithEvents
 
             async public Task<List<string>> query2(List<string> s)
             {
-                await Task.Delay(TimeSpan.FromSeconds(1));
+                await Task.Delay(TimeSpan.FromSeconds(10));
                 s.Add("query2");
                 return s;
             }
